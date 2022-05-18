@@ -12,7 +12,7 @@ inquirer.prompt([
     type: 'list',
     name: 'admin_options',
     message: 'What would you like to do?',
-    choices: ['View All Employees', 'Add Employee', "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department"]
+    choices: ["View All Employees", "View All Roles", "View All Departments", "Add Employee", "Add Role", "Add Department", "Update Employee Role"]
 },
 ])
         .then((answers) => {
@@ -41,6 +41,10 @@ inquirer.prompt([
         }
 })};
 
+
+
+// all possible options functions
+
 const viewAllEmployees = ()=> {
     //Join role, employee, department, import manager as name not id
     const sql = `SELECT employee.first_name, employee.last_name, department.name AS department, roles.title, salary FROM employee 
@@ -52,10 +56,9 @@ const viewAllEmployees = ()=> {
           console.table(res);
           initialize_prompt(); 
         })
-      
-    
-
 }
+
+
 const addEmployee = ()=> {
 
 
