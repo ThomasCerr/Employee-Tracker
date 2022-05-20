@@ -117,7 +117,7 @@ const addEmployee = ()=> {
     {
         type: 'list',
         name: 'add_employee_managerID',
-        message: 'What is the managers ID of the Employee?',
+        message: 'What is the managers ID of the Employee, if they are a manager select "Manager"?',
         choices: managerList
     },
       ])
