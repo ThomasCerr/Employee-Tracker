@@ -7,8 +7,8 @@ require('events').EventEmitter.defaultMaxListeners = 30;
 var departmentList = [];
 var managerList = [];
 var roleList = [];
-var employeeNames = [];
 var updateRoleList = [];
+var employeeList = [];
 
 
 var initialize_prompt  = ()=> {
@@ -90,7 +90,7 @@ const addEmployee = ()=> {
                 }
              }
             managerList.push({name:"Manager"})
-            console.log(managerList)
+            
         })
             
            
@@ -135,52 +135,65 @@ const addEmployee = ()=> {
               })
 
 }
-const updateEmployeeRole = ()=> {
-
-    var pullEmployeeSQL = `SELECT CONCAT (employee.first_name, ' ' ,employee.last_name) AS Employee FROM employee;`;
+const updateEmployeeRole  = async ()=> {
     
-    db.query(pullEmployeeSQL, (err, res) => {
-        if (err) {console.log(err);}
-        employeeNames.push(res)
-        }
-        )
+    var pullEmployeeSQL = `SELECT DISTINCT ID, CONCAT (employee.first_name, ' ' ,employee.last_name) AS Employee FROM employee;`;
 
-    const sql = `SELECT DISTINCT roles.title AS Roles FROM Roles`;
 
-    db.query(sql, (err, res) => {
+  db.query(pullEmployeeSQL, (err, res) => {
         if (err) {console.log(err);}
+        for(var i = 0; i <res.length; i++){ 
         
-        updateRoleList.push(res)
+            employeeList.push({name:res[i].Employee, value:res[i].ID })   
+    
+        } 
+    })
+  
 
+    var roleSQL = `SELECT DISTINCT ID, roles.title AS Roles FROM Roles`;
+    db.query(roleSQL, (err, res) => {
+        if (err) {console.log(err);}
+        for(var i = 0; i <res.length; i++){
+            updateRoleList.push({name:res[i].Roles, value: res[i].ID})   
+         }
+    })
             inquirer.prompt([
+                {
+                    type: 'confirm',
+                    name: 'confirm',
+                    message: 'Do you want to change an employees role?',
+            
+                  },
             {
                 type: 'list',
-                name: 'add_employee_firstname',
+                name: 'employee_name',
                 message: 'What is the first name of the Employee?',
-                choices:employeeNames
+                choices:employeeList
                 
               },
               {
                 type: 'list',
-                name: 'add_employee_firstname',
+                name: 'role_change_id',
                 message: 'What role do you want to assign to the Employee?',
                 choices: updateRoleList
                 
               },
             ])
               .then((answers) =>{
-                // const addEmployeeSql = `INSERT INTO employee(first_name,last_name,roles_id,manager_id)
-                // VALUES ("${answers.add_employee_firstname}","${answers.add_employee_lastname}","${answers.add_employee_role}","${answers.add_employee_managerID}");`
-                // db.query(addEmployeeSql, (err, res) => {
+    
+
+                const updateEmployeeRole = `UPDATE employee
+                SET roles_id= ${answers.role_change_id}
+                WHERE employee.id = ${answers.employee_name};`
+                db.query(updateEmployeeRole, (err, res) => {
                 if (err) {console.log(err);}
-                    
-                    
                     })
                     initialize_prompt();
+                    console.log("Employee Role has been Updated")          
+            })
+        }
 
-              })
 
-}
 const viewAllRoles = ()=> {
     const sql = `SELECT DISTINCT roles.title AS Roles FROM Roles`;
     db.query(sql, (err, res) => {
@@ -197,44 +210,45 @@ const addRole= ()=> {
         if (err) {console.log(err);}
         for(var i = 0; i <res.length; i++){
             departmentList.push({name:res[i].name, value:i+1}) 
-            console.log(departmentList)
+           
         }
         })
-        
+       
     inquirer.prompt([
         {
-          type: 'input',
-          name: 'add_role_title',
-          message: 'What is the title of the Role?'
+        type: 'input',
+        name: 'add_role_title',
+        message: 'What is the title of the Role?'
       },
         {
-            type: 'input',
-            name: 'add_role_salary',
-            message: 'What is the salary of the Role?'
+        type: 'input',
+        name: 'add_role_salary',
+        message: 'What is the salary of the Role?'
         },
         {
-            type: 'list',
-            name: 'add_role_department',
-            message: 'What is the department of this Role?',
-            choices: departmentList
+        type: 'list',
+        name: 'add_role_department',
+        message: 'What is the department of this Role?',
+        choices: departmentList
     },
       ])
               .then((answers) =>{
-            console.log(answers.add_role_department)
+            
                 const addRoleSql = `INSERT INTO roles(title,salary,department_ID)
                 VALUES ("${answers.add_role_title}","${answers.add_role_salary}", "${answers.add_role_department}");`;
 
                     db.query(addRoleSql, (err, res) => {
                     if (err) {console.log(err);}
-                        initialize_prompt(); 
+                        
                         })
-
+                        initialize_prompt();
+                        console.log("Employee Role has been Added")
                 })
 
 
 }
 const viewAllDepartments = ()=> {
-    const sql = `SELECT DISTINCT department.name AS Department FROM department`;
+    const sql = `SELECT DISTINCT department.id, department.name AS Department FROM department`;
 
     db.query(sql, (err, res) => {
         if (err) {console.log(err);}
@@ -260,6 +274,7 @@ const addDepartment = ()=> {
                 if (err) {console.log(err);}
                     
                     initialize_prompt(); 
+                    console.log("Department Added")
                     })
 
               })
