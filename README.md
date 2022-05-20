@@ -39,4 +39,4 @@ THEN I am prompted to select an employee to update and their new role and this i
 ```
 ## Mockup
 
-<img src= "https://github.com/ThomasCerr/Team-Profile-Generator/blob/main/mockup/Untitled_%20May%208%2C%202022%204_18%20PM.mp4">
+<img src= "https://github.com/ThomasCerr/Employee-Tracker/blob/main/mockup/ch2_%20May%2020%2C%202022%202_06%20PM.mp4">
